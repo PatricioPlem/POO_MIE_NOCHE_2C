@@ -1,0 +1,22 @@
+@startuml
+actor Main
+Main -> CentroDeportivo: +calcularPrecioFinal(int idReserva) : double
+activate CentroDeportivo
+CentroDeportivo -> CentroDeportivo: buscarReserva(int idReserva): Reserva
+alt encuentra la Reserva buscada
+  CentroDeportivo -> Reserva: calcularPrecio(): double
+  activate Reserva
+  Reserva -> Instalacion: calcularPrecio() : double
+  activate Instalacion
+  Instalacion --> Reserva: double
+  deactivate Instalacion
+  Reserva -> Reserva: fijarPrecioFinal(double valor) : void
+  Reserva -->  CentroDeportivo: double
+  deactivate Reserva
+  CentroDeportivo --> Main: double
+else No se encontro la reserva buscada
+  CentroDeportivo --> Main: laReservaNoExiste
+end
+deactivate CentroDeportivo
+
+@enduml

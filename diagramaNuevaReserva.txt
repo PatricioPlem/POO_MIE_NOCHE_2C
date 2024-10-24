@@ -1,0 +1,35 @@
+@startuml
+actor Main
+Main -> CentroDeportivo: nuevaReserva(Date dia, int idLugar, String dni): Reserva
+activate CentroDeportivo
+CentroDeportivo -> CentroDeportivo: buscarCliente(String dni): Cliente
+CentroDeportivo -> CentroDeportivo: buscarInstalacion(int idLugar): Instalacion
+CentroDeportivo -> CentroDeportivo: validarMaximo(Date dia , Instalacion lugar): boolean
+alt hay menos reservas que maximoDiario para la instalacion de la reserva
+  CentroDeportivo -> Cliente: generarReserva(Date dia, Instalacion instalacion): Reserva
+  activate Cliente
+  Cliente -> Cliente: reservaPendiente(): boolean
+  alt no tiene ninguna reservaPendiente
+    Cliente -> Reserva: generarReserva(Date dia, Instalacion instalacion, Cliente cliente): Reserva
+    activate Reserva
+    Reserva -> Instalacion: calcularPrecio() : double
+    activate Instalacion
+    Instalacion --> Reserva: double
+    deactivate Instalacion
+    Reserva --> Cliente : Reserva
+    deactivate Reserva
+    Cliente -> Cliente : agregarReserva(Reserva nuevaReserva): void
+    Cliente --> CentroDeportivo : Reserva
+    CentroDeportivo -> CentroDeportivo: agregarReserva(Reserva nuevaReserva): void
+    CentroDeportivo --> Main: Reserva
+  else el cliente tiene una reserva pendiente
+    Cliente --> CentroDeportivo : ExcepecionReservaPendiente 
+    CentroDeportivo --> Main : ExcepecionReservaPendiente 
+  end
+else se alcanzo el maximo de reservas para ese dia
+  CentroDeportivo --> Main: ExcepcionMaximoDiarioAlcanzado
+end
+deactivate Cliente
+deactivate CentroDeportivo
+
+@enduml
